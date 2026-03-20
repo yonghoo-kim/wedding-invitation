@@ -1,0 +1,90 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Supabase 전용 직통 연결 (테이블 생성용)
+}
+
+// 1. 서비스 가입 고객 (결제 및 관리자 계정)
+model User {
+  id          String       @id @default(uuid())
+  email       String       @unique
+  password    String       
+  name        String
+  createdAt   DateTime     @default(now())
+  
+  invitations Invitation[] 
+}
+
+// 2. 청첩장 기본 정보
+model Invitation {
+  id              String   @id @default(uuid()) // 청첩장 URL 고유 주소
+  urlSlug         String   @unique
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  theme           String   @default("summer")
+  bgmFilename     String?
+  mainImage       String?
+  closingImage    String?
+
+  groomLastName   String
+  groomFirstName  String
+  brideLastName   String
+  brideFirstName  String
+
+  weddingDate     DateTime 
+  weddingLocation String
+  weddingAddress  String
+  weddingLat      Float?
+  weddingLng      Float?
+
+  // 혼주 및 계좌 정보 (JSON 형태로 저장)
+  groomAccountInfo Json?   
+  brideAccountInfo Json?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  guestbooks      Guestbook[]
+  useRsvp         Boolean  @default(true)
+  rsvps           Rsvp[]
+  
+  galleryImages   String[] @default([])
+  greetingMessage String? @db.Text
+
+  transitSubway   String?
+  transitBus      String?
+  transitParking  String?
+}
+
+// 3. 방명록
+model Guestbook {
+  id           String     @id @default(uuid())
+  invitationId String
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  
+  guestName    String
+  password     String     
+  message      String     @db.Text
+  createdAt    DateTime   @default(now())
+}
+
+// 4. 참석 여부 (RSVP)
+model Rsvp {
+  id             String     @id @default(uuid())
+  invitationId   String
+  invitation     Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  
+  guestName      String
+  contact        String?    
+  attendStatus   String     
+  companionCount Int        @default(0)
+  hasMeal        Boolean    @default(true)
+  createdAt      DateTime   @default(now())
+}
