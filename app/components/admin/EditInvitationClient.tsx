@@ -44,7 +44,6 @@ export default function EditInvitationClient({ initialData }: { initialData: any
   const [activeTab, setActiveTab] = useState(STEPS[0].id);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 🌟 1. formData에 대중교통 및 주차 안내 필드 추가
   const [formData, setFormData] = useState({
     urlSlug: initialData.urlSlug || '',
     theme: initialData.theme || 'spring',
@@ -61,9 +60,9 @@ export default function EditInvitationClient({ initialData }: { initialData: any
     weddingAddress: initialData.weddingAddress || '',
     weddingLat: initialData.weddingLat || '',
     weddingLng: initialData.weddingLng || '',
-    transitSubway: initialData.transitSubway || '',   // 지하철 추가
-    transitBus: initialData.transitBus || '',         // 버스 추가
-    transitParking: initialData.transitParking || '', // 주차 안내 추가
+    transitSubway: initialData.transitSubway || '',
+    transitBus: initialData.transitBus || '',
+    transitParking: initialData.transitParking || '',
     galleryImages: initialData.galleryImages || [],
     useRsvp: initialData.useRsvp !== false,
   });
@@ -77,7 +76,6 @@ export default function EditInvitationClient({ initialData }: { initialData: any
   const [groomAcc, setGroomAcc] = useState(getAcc(initialData.groomAccountInfo));
   const [brideAcc, setBrideAcc] = useState(getAcc(initialData.brideAccountInfo));
 
-  // 🌟 탭 변경 시 자동 스크롤
   useEffect(() => {
     const sectionElement = document.getElementById(`preview-${activeTab}`);
     if (sectionElement) {
@@ -87,13 +85,12 @@ export default function EditInvitationClient({ initialData }: { initialData: any
 
   useEffect(() => {
     if (!formData.useRsvp) return;
-
     setTimeout(() => {
       const rsvpEl = document.getElementById('preview-rsvp');
       if (rsvpEl) {
         rsvpEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }, 150); // 렌더링 완료 후 스크롤
+    }, 150);
   }, [formData.useRsvp]);
 
   const handleFormChange = (e: any) => {
@@ -103,7 +100,7 @@ export default function EditInvitationClient({ initialData }: { initialData: any
     if (name === 'urlSlug') {
       setFormData(prev => ({ ...prev, urlSlug: value.toLowerCase().replace(/[^a-z0-9-]/g, '') }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: val })); // ← val 사용, prev 패턴으로 안전하게
+      setFormData(prev => ({ ...prev, [name]: val }));
     }
   };
 
@@ -112,7 +109,6 @@ export default function EditInvitationClient({ initialData }: { initialData: any
 
   const handleSave = async () => {
     setIsSubmitting(true);
-
     const finalData = {
       ...formData,
       weddingDate: new Date(formData.weddingDate),
@@ -160,7 +156,25 @@ export default function EditInvitationClient({ initialData }: { initialData: any
     : ['/images/wedding/section1.png'];
 
   return (
-    <div className="absolute inset-0 w-full h-[100dvh] overflow-y-auto overflow-x-hidden bg-[#FDFCFB] font-sans text-stone-800 flex flex-col">
+    <div className="absolute inset-0 w-full h-[100dvh] overflow-y-auto overflow-x-hidden bg-[#FDFCFB] font-sans text-stone-800 flex flex-col scroll-pt-[100px]">
+      
+      {/* 🌟 폼 테두리 깜빡임 효과를 위한 CSS */}
+      <style>{`
+        @keyframes border-pulse {
+          0%, 100% { border-color: #e5e7eb; }
+          50% { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15); }
+        }
+        
+        /* 폼 컨테이너 (section h3 아래의 div 또는 특정 클래스를 가진 div) 내부에 포커스가 갔을 때 테두리 깜빡임 */
+        main section:focus-within > div,
+        main div.bg-white.rounded-2xl:focus-within {
+          animation: border-pulse 1.5s ease-in-out infinite;
+          border-color: #f59e0b !important;
+        }
+        
+        /* 미리보기 스크롤 튀는 현상 방지 */
+        .preview-scroll section { height: 880px !important; min-height: 880px !important; }
+      `}</style>
 
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200 h-14 px-4 md:px-6 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
@@ -181,7 +195,6 @@ export default function EditInvitationClient({ initialData }: { initialData: any
       </header>
 
       <div className="flex-1 flex flex-col md:flex-row max-w-[1500px] mx-auto w-full relative">
-
         <aside className="w-full md:w-48 lg:w-56 border-b md:border-b-0 md:border-r border-stone-200 bg-stone-50/50 shrink-0">
           <div className="flex flex-row md:flex-col p-2 md:p-4 gap-1 overflow-x-auto scrollbar-hide md:sticky md:top-14">
             <p className="hidden md:block text-[11px] font-bold text-stone-400 uppercase tracking-widest mb-2 px-2">Edit Menu</p>
@@ -198,11 +211,13 @@ export default function EditInvitationClient({ initialData }: { initialData: any
           </div>
         </aside>
 
-        <main className="flex-1 p-5 md:p-8 lg:p-10">
+        <main className="flex-1 p-5 md:p-8 lg:p-10 relative">
           <div className="max-w-2xl mx-auto pb-20">
-            <h2 className={`${koreanFont.className} text-xl font-bold text-stone-900 mb-6 pb-4 border-b border-stone-100`}>
-              {STEPS.find(s => s.id === activeTab)?.label} 수정
-            </h2>
+            <div className="flex items-center justify-between border-b border-stone-100 mb-6 pb-4">
+              <h2 className={`${koreanFont.className} text-xl font-bold text-stone-900`}>
+                {STEPS.find(s => s.id === activeTab)?.label} 수정
+              </h2>
+            </div>
 
             <AnimatePresence mode="wait">
               <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
@@ -229,58 +244,28 @@ export default function EditInvitationClient({ initialData }: { initialData: any
                 <SeasonalEffect theme={previewTheme} key={`effect-${previewTheme}`} />
                 <FixedBackground theme={previewTheme} key={`bg-${previewTheme}`} />
 
-                <div className="absolute inset-0 w-full h-full overflow-y-auto overflow-x-hidden snap-y snap-mandatory custom-scrollbar preview-scroll">
-                  <style>{`.preview-scroll section { height: 880px !important; min-height: 880px !important; scroll-snap-align: start; }`}</style>
-
+                <div className="absolute inset-0 w-full h-full overflow-y-auto overflow-x-hidden custom-scrollbar preview-scroll">
                   <BackgroundMusic bgm={formData.bgmFilename} />
 
                   <div id="preview-basic">
-                    <Section1_Main
-                      groomLastName={previewGroomLast}
-                      groomFirstName={previewGroomFirst}
-                      brideLastName={previewBrideLast}
-                      brideFirstName={previewBrideFirst}
-                      mainImage={formData.mainImage}
-                    />
+                    <Section1_Main groomLastName={previewGroomLast} groomFirstName={previewGroomFirst} brideLastName={previewBrideLast} brideFirstName={previewBrideFirst} mainImage={formData.mainImage} />
                   </div>
 
                   <div id="preview-greeting">
-                    <Section2_Quote
-                      greetingMessage={formData.greetingMessage}
-                      groomFirstName={previewGroomFirst}
-                      brideFirstName={previewBrideFirst}
-                      groomFatherName={previewGroomAccount.father.name}
-                      groomMotherName={previewGroomAccount.mother.name}
-                      brideFatherName={previewBrideAccount.father.name}
-                      brideMotherName={previewBrideAccount.mother.name}
-                      theme={previewTheme as any}
-                    />
+                    <Section2_Quote greetingMessage={formData.greetingMessage} groomFirstName={previewGroomFirst} brideFirstName={previewBrideFirst} groomFatherName={previewGroomAccount.father.name} groomMotherName={previewGroomAccount.mother.name} brideFatherName={previewBrideAccount.father.name} brideMotherName={previewBrideAccount.mother.name} theme={previewTheme as any} />
                   </div>
 
                   <div id="preview-wedding">
                     <Section3_Calendar weddingDate={previewDate} theme={previewTheme as any} />
-                    <div id="preview-wedding">
-                      <Section3_Calendar weddingDate={previewDate} theme={previewTheme as any} />
-                      {formData.useRsvp && (
-                        <div id="preview-rsvp">  {/* ← id 추가 */}
-                          <Section_RSVP invitationId={initialData.id || "preview-only"} theme={previewTheme as any} />
-                        </div>
-                      )}
-                    </div>
+                    {formData.useRsvp && (
+                      <div id="preview-rsvp">
+                        <Section_RSVP invitationId={initialData.id || "preview-only"} theme={previewTheme as any} />
+                      </div>
+                    )}
                   </div>
 
-                  {/* 🌟 2. 지도 섹션에 교통/주차 정보 & 테마 Props 넘겨주기 */}
                   <div id="preview-map">
-                    <Section5_Map
-                      locationName={previewLocation}
-                      address={previewAddress}
-                      lat={previewLat}
-                      lng={previewLng}
-                      transitSubway={formData.transitSubway}
-                      transitBus={formData.transitBus}
-                      transitParking={formData.transitParking}
-                      theme={previewTheme as any}
-                    />
+                    <Section5_Map locationName={previewLocation} address={previewAddress} lat={previewLat} lng={previewLng} transitSubway={formData.transitSubway} transitBus={formData.transitBus} transitParking={formData.transitParking} theme={previewTheme as any} />
                   </div>
 
                   <div id="preview-media">
@@ -288,27 +273,14 @@ export default function EditInvitationClient({ initialData }: { initialData: any
                   </div>
 
                   <div id="preview-account">
-                    <Section6_Gift
-                      invitationId={initialData.id || "preview-only"}
-                      groomLastName={previewGroomLast}
-                      groomFirstName={previewGroomFirst}
-                      brideLastName={previewBrideLast}
-                      brideFirstName={previewBrideFirst}
-                      groomAccount={previewGroomAccount as any}
-                      brideAccount={previewBrideAccount as any}
-                    />
-                    <Section7_Closing
-                      closingImage={formData.closingImage || '/images/wedding/closing.png'}
-                      weddingDate={previewDate}
-                    />
+                    <Section6_Gift invitationId={initialData.id || "preview-only"} groomLastName={previewGroomLast} groomFirstName={previewGroomFirst} brideLastName={previewBrideLast} brideFirstName={previewBrideFirst} groomAccount={previewGroomAccount as any} brideAccount={previewBrideAccount as any} />
+                    <Section7_Closing closingImage={formData.closingImage || '/images/wedding/closing.png'} weddingDate={previewDate} />
                   </div>
-
                 </div>
               </div>
             </div>
           </div>
         </aside>
-
       </div>
     </div>
   );
