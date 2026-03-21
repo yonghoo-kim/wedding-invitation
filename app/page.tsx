@@ -2,16 +2,29 @@ import Link from 'next/link';
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
 import { 
-  ArrowRight, Sparkles, HeartHandshake, Smartphone, 
-  Palette, LogOut, LayoutDashboard, Star, Users, CheckCircle2 
+  ArrowRight, Sparkles, LayoutTemplate, HeartHandshake,
+  CreditCard, LogOut, LayoutDashboard, MessageSquare, Users, Link2, Plus
 } from 'lucide-react';
-import { Gowun_Batang, Noto_Sans_KR } from 'next/font/google';
+import { Noto_Sans_KR, Inter } from 'next/font/google';
 import { logoutUser } from '@/app/actions/userAuth';
+import * as motion from "framer-motion/client";
 
-// 🌟 감성적인 제목용 폰트 (고운바탕)
-const koreanFont = Gowun_Batang({ subsets: ['latin'], weight: ['400', '700'], display: 'swap' });
-// 🌟 깔끔한 본문용 폰트 (본고딕)
-const notoSansKr = Noto_Sans_KR({ subsets: ['latin'], weight: ['400', '500', '700'], display: 'swap' });
+// 폰트 설정
+const inter = Inter({ subsets: ['latin'], display: 'swap' });
+const notoSansKr = Noto_Sans_KR({ subsets: ['latin'], weight: ['400', '500', '700', '900'], display: 'swap' });
+
+// 🌟 트렌디한 스프링 애니메이션
+const springFadeIn = {
+  initial: { opacity: 0, y: 30, scale: 0.95 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  transition: { type: "spring", stiffness: 100, damping: 20 },
+};
+
+const staggerContainer = {
+  animate: {
+    transition: { staggerChildren: 0.1 },
+  },
+};
 
 export default async function PlatformLandingPage() {
   const cookieStore = await cookies();
@@ -26,237 +39,211 @@ export default async function PlatformLandingPage() {
   const isLoggedIn = !!userName;
 
   return (
-    // 🌟 Y 스크롤 복구 및 본문 전체에 Noto_Sans_KR 적용
-    <main className={`absolute inset-0 w-full h-[100dvh] overflow-y-auto overflow-x-hidden bg-[#FAFAFA] selection:bg-amber-200 text-stone-800 ${notoSansKr.className}`}>
+    // 🌟 세로 스크롤 완벽 복구: absolute inset-0 w-full h-[100dvh] overflow-y-auto overflow-x-hidden
+    <main className={`absolute inset-0 w-full h-[100dvh] overflow-y-auto overflow-x-hidden bg-[#FCFCFD] selection:bg-orange-100 text-zinc-900 ${notoSansKr.className} pb-20`}>
       
-      {/* ✨ 배경 데코레이션 */}
-      <div className="absolute top-0 left-0 w-full h-[800px] overflow-hidden -z-10 pointer-events-none">
-        <div className="absolute -top-[20%] -right-[10%] w-[70%] h-[70%] rounded-full bg-gradient-to-b from-amber-100/40 to-transparent blur-[120px]" />
-        <div className="absolute top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-gradient-to-b from-rose-50/60 to-transparent blur-[100px]" />
+      {/* 화사한 오로라빛 배경 */}
+      <div className="absolute top-0 left-0 w-full h-[800px] overflow-hidden -z-10 pointer-events-none opacity-60">
+        <div className="absolute top-[-20%] left-[20%] w-[50%] h-[50%] rounded-full bg-gradient-to-br from-orange-200 to-rose-100 blur-[120px]" />
+        <div className="absolute top-[10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-gradient-to-bl from-amber-100 to-yellow-50 blur-[100px]" />
       </div>
 
-      {/* 🌟 1. 상단 네비게이션 바 (GNB) */}
-      <nav className="fixed w-full top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/50 shadow-[0_2px_20px_rgba(0,0,0,0.02)] transition-all">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      {/* 1. 플로팅 헤더 */}
+      <div className="fixed top-6 inset-x-0 w-full z-50 flex justify-center px-4 pointer-events-none">
+        <nav className="pointer-events-auto flex items-center justify-between w-full max-w-4xl px-5 py-3.5 bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-full transition-all">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 bg-zinc-900 flex items-center justify-center rounded-full group-hover:bg-orange-500 transition-colors">
               <Sparkles className="text-white w-4 h-4" />
             </div>
-            <span className={`${koreanFont.className} text-2xl font-bold tracking-wider text-stone-900`}>O'hoo</span>
+            <span className={`${inter.className} text-xl font-black tracking-tight text-zinc-900`}>O'hoo</span>
           </Link>
           
-          <div className="flex items-center gap-4 text-sm font-medium">
+          <div className="flex items-center gap-3">
             {isLoggedIn ? (
               <>
-                <span className="text-stone-600 hidden sm:inline mr-2 bg-stone-100 px-3 py-1.5 rounded-full">
-                  <span className="font-bold text-stone-900">{userName}</span>님 환영합니다
+                <span className="text-zinc-500 hidden sm:inline mr-2 text-sm font-semibold">
+                  <span className="text-zinc-900">{userName}</span>님
                 </span>
-                <Link href="/mypage" className="flex items-center gap-1.5 px-4 py-2 text-stone-700 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all font-bold">
-                  <LayoutDashboard className="w-4 h-4" /> <span className="hidden sm:inline">나의청첩장</span>
+                <Link href="/mypage" className="flex items-center gap-1.5 px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-full transition-all text-sm font-bold">
+                  <LayoutDashboard className="w-4 h-4" /> <span className="hidden sm:inline">대시보드</span>
                 </Link>
                 <form action={logoutUser}>
-                  <button type="submit" className="flex items-center gap-1.5 px-3 py-2 text-stone-400 hover:text-stone-700 transition-colors">
+                  <button type="submit" className="flex items-center justify-center w-9 h-9 bg-zinc-50 hover:bg-zinc-100 text-zinc-400 hover:text-red-500 rounded-full transition-colors">
                     <LogOut className="w-4 h-4" />
                   </button>
                 </form>
               </>
             ) : (
               <>
-                <Link href="/login" className="text-stone-500 hover:text-stone-900 transition-colors font-medium">로그인</Link>
-                <Link href="/signup" className="px-5 py-2.5 bg-stone-900 text-white font-bold rounded-xl hover:bg-stone-800 hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                  무료로 시작하기
+                <Link href="/login" className="px-4 py-2 text-zinc-500 hover:text-zinc-900 transition-colors text-sm font-bold">로그인</Link>
+                <Link href="/signup" className="px-5 py-2.5 bg-zinc-900 text-white text-sm font-bold rounded-full hover:bg-orange-500 transition-colors shadow-sm">
+                  무료 시작하기
                 </Link>
               </>
             )}
           </div>
-        </div>
-      </nav>
+        </nav>
+      </div>
 
-      {/* 🌟 2. 메인 히어로 섹션 (Hero) */}
-      <section className="relative pt-32 pb-20 px-6 lg:pt-48 lg:pb-32 max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+      {/* 🌟 2. 메인 히어로 & Bento Grid 통합 섹션 (오글거리는 멘트 제거, 담백하게 변경) */}
+      <motion.section 
+        initial="initial" 
+        whileInView="animate" 
+        viewport={{ once: true }} 
+        variants={staggerContainer}
+        className="pt-36 px-4 md:px-8 max-w-6xl mx-auto"
+      >
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <motion.div variants={springFadeIn} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-50 text-orange-600 text-[13px] font-bold mb-6 border border-orange-100 shadow-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+            </span>
+            쉽고 깔끔한 모바일 청첩장
+          </motion.div>
           
-          <div className="text-left z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-stone-200 shadow-sm text-stone-600 text-xs font-bold mb-8">
-              <span className="flex h-2 w-2 rounded-full bg-amber-500"></span>
-              2026 트렌드 반영 프리미엄 청첩장 솔루션
-            </div>
-            
-            <h1 className={`${koreanFont.className} text-5xl lg:text-[4rem] font-bold text-stone-900 mb-6 leading-[1.15] tracking-tight`}>
-              가장 빛나는 순간,<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-rose-400">
-                완벽한 초대장
-              </span>
-              을<br /> 경험하세요.
-            </h1>
-            
-            <p className="text-stone-500 text-lg mb-10 max-w-xl leading-relaxed">
-              복잡한 코딩이나 디자인 지식은 필요 없습니다. O'hoo의 직관적인 빌더를 통해 단 3분 만에 우리 커플만의 감성을 담은 모바일 청첩장을 완성해 보세요.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              {isLoggedIn ? (
-                <>
-                  <Link href="/create" className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-stone-900 text-white font-bold rounded-2xl hover:bg-stone-800 transition-all shadow-xl hover:-translate-y-1">
-                    새 청첩장 만들기 <ArrowRight className="w-5 h-5" />
-                  </Link>
-                  <Link href="/mypage" className="w-full sm:w-auto px-8 py-4 bg-white text-stone-800 font-bold rounded-2xl border border-stone-200 hover:bg-stone-50 transition-colors shadow-sm text-center">
-                    내 청첩장 관리
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link href="/signup" className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-stone-900 to-stone-800 text-white font-bold rounded-2xl hover:opacity-90 transition-all shadow-xl hover:-translate-y-1">
-                    지금 무료로 만들기 <ArrowRight className="w-5 h-5" />
-                  </Link>
-                  <button className="w-full sm:w-auto px-8 py-4 bg-white/80 backdrop-blur-sm text-stone-700 font-bold rounded-2xl border border-stone-200 hover:bg-white transition-colors shadow-sm">
-                    샘플 갤러리 보기
-                  </button>
-                </>
-              )}
-            </div>
-
-            <div className="mt-12 flex items-center gap-6 pt-8 border-t border-stone-200/60">
-              <div className="flex -space-x-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className={`w-10 h-10 rounded-full border-2 border-[#FAFAFA] bg-stone-${i*100} flex items-center justify-center shadow-sm bg-stone-200`} />
-                ))}
-              </div>
-              <div>
-                <div className="flex items-center gap-1 text-amber-500 mb-1">
-                  <Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" /><Star className="w-4 h-4 fill-current" />
-                </div>
-                <p className="text-sm text-stone-500"><strong className="text-stone-800">12,400+</strong> 쌍의 예비 부부가 선택했습니다</p>
-              </div>
-            </div>
-          </div>
-
-          {/* 우측 목업 */}
-          <div className="relative hidden lg:block h-[600px] w-full">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gradient-to-tr from-amber-200/40 to-rose-200/40 rounded-full blur-3xl -z-10" />
-            
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[600px] bg-white rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.1)] border-[10px] border-stone-100 overflow-hidden transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
-              <div className="w-full h-full bg-stone-50 relative">
-                <div className="absolute top-0 inset-x-0 h-6 bg-white rounded-b-3xl w-1/2 mx-auto z-10" />
-                <div className="w-full h-[50%] bg-stone-200 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=800&auto=format&fit=crop')] bg-cover bg-center opacity-80" />
-                </div>
-                <div className="p-6 text-center mt-4">
-                  <p className={`${koreanFont.className} text-2xl mb-2 font-bold`}>김철수 & 이영희</p>
-                  <p className="text-xs text-stone-400 mb-6 font-medium">2026. 05. 24. SAT PM 12:30</p>
-                  <div className="w-full h-10 bg-stone-100 rounded-lg mb-3 animate-pulse" />
-                  <div className="w-3/4 h-10 bg-stone-100 rounded-lg mx-auto animate-pulse" />
-                </div>
-              </div>
-            </div>
-          </div>
+          <motion.h1 variants={springFadeIn} className="text-5xl md:text-6xl lg:text-[5rem] font-black text-zinc-900 mb-6 leading-[1.05] tracking-tighter break-keep">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-rose-400">
+              우리의 초대장.
+            </span>
+          </motion.h1>
           
+          <motion.p variants={springFadeIn} className="text-zinc-500 text-lg md:text-xl font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
+            복잡한 과정은 다 뺐습니다. 꼭 필요한 기능만 담아 누구나 직관적으로 모바일 청첩장을 만들 수 있습니다.
+          </motion.p>
+          
+          <motion.div variants={springFadeIn} className="flex flex-wrap justify-center gap-3">
+            {isLoggedIn ? (
+              <Link href="/create" className="flex items-center gap-2 px-8 py-4 bg-zinc-900 text-white font-bold rounded-full hover:bg-orange-500 transition-colors shadow-lg shadow-orange-500/10">
+                <Plus className="w-5 h-5" /> 새 청첩장 만들기
+              </Link>
+            ) : (
+              <Link href="/signup" className="flex items-center gap-2 px-8 py-4 bg-zinc-900 text-white font-bold rounded-full hover:bg-orange-500 transition-colors shadow-lg shadow-orange-500/10">
+                지금 무료로 만들기 <ArrowRight className="w-5 h-5" />
+              </Link>
+            )}
+            <button className="flex items-center gap-2 px-8 py-4 bg-white text-zinc-700 font-bold rounded-full border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-all shadow-sm">
+              샘플 디자인 보기
+            </button>
+          </motion.div>
         </div>
-      </section>
 
-      {/* 🌟 3. 주요 기능 소개 섹션 (Features) */}
-      <section className="py-24 bg-white px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-amber-600 font-bold tracking-wider text-sm mb-3">CORE FEATURES</h2>
-            <h3 className={`${koreanFont.className} text-4xl font-bold text-stone-900 mb-4`}>결혼 준비를 더 완벽하게</h3>
-            <p className="text-stone-500 text-lg">오직 두 사람에게만 집중하세요. 나머지는 O'hoo가 해결해 드립니다.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 p-10 rounded-3xl bg-stone-50 border border-stone-100/80 hover:shadow-xl transition-all duration-300 group overflow-hidden relative">
-              <div className="relative z-10">
-                <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8">
-                  <Palette className="text-amber-500 w-7 h-7" />
+        {/* 🌟 밀도 높은 Bento Grid (담백한 문구로 수정) */}
+        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4 md:gap-6 auto-rows-[240px]">
+          
+          {/* 큰 박스 1: 직관적인 에디터 */}
+          <motion.div variants={springFadeIn} className="md:col-span-2 md:row-span-2 bg-white rounded-3xl p-8 border border-zinc-100 shadow-[0_8px_30px_rgb(0,0,0,0.03)] flex flex-col justify-between overflow-hidden group hover:border-orange-200 transition-colors relative">
+            <div className="relative z-10">
+              <div className="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center mb-5">
+                <LayoutTemplate className="w-6 h-6" />
+              </div>
+              <h3 className="text-2xl font-bold text-zinc-900 mb-2">어려운 설정 없이 간편하게</h3>
+              <p className="text-zinc-500 font-medium">눈에 보이는 대로 텍스트를 적고 사진을 올리세요.<br/>드래그 앤 드롭으로 3분이면 레이아웃이 완성됩니다.</p>
+            </div>
+            {/* 추상적인 UI 조각 비주얼 */}
+            <div className="relative h-48 mt-8 w-full bg-zinc-50 rounded-2xl border border-zinc-100 p-4 flex gap-3 group-hover:bg-orange-50/50 transition-colors z-10">
+              <div className="w-1/3 h-full bg-white rounded-xl shadow-sm border border-zinc-100/50 flex flex-col p-3 gap-2">
+                <div className="w-full h-20 bg-zinc-100 rounded-lg animate-pulse"></div>
+                <div className="w-3/4 h-3 bg-zinc-100 rounded-full mt-auto"></div>
+              </div>
+              <div className="flex-1 h-full flex flex-col gap-3">
+                <div className="w-full flex-1 bg-white rounded-xl shadow-sm border border-zinc-100/50 p-3 flex flex-col justify-center gap-2">
+                   <div className="w-1/2 h-3 bg-zinc-100 rounded-full"></div>
+                   <div className="w-full h-3 bg-zinc-100 rounded-full"></div>
                 </div>
-                <h4 className="text-2xl font-bold text-stone-900 mb-4">커스텀 테마 에셋</h4>
-                <p className="text-stone-500 text-lg leading-relaxed max-w-md">
-                  계절의 변화, 두 사람의 취향을 담은 수십 가지의 프리미엄 템플릿. 드래그 앤 드롭으로 사진과 텍스트를 손쉽게 배치하세요.
-                </p>
-              </div>
-              <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-amber-100 rounded-full blur-3xl opacity-50 group-hover:scale-110 transition-transform duration-500" />
-            </div>
-            
-            <div className="p-10 rounded-3xl bg-stone-900 text-white hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-              <div className="w-14 h-14 bg-stone-800 rounded-2xl flex items-center justify-center mb-8 border border-stone-700">
-                <Smartphone className="text-white w-7 h-7" />
-              </div>
-              <h4 className="text-2xl font-bold mb-4">모바일 최적화 UI</h4>
-              <p className="text-stone-400 leading-relaxed">
-                어떤 기기에서도 완벽한 비율. 카카오톡 공유 썸네일까지 세심하게 맞춰드립니다.
-              </p>
-            </div>
-
-            <div className="p-10 rounded-3xl bg-rose-50 border border-rose-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-              <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-8 shadow-sm">
-                <HeartHandshake className="text-rose-400 w-7 h-7" />
-              </div>
-              <h4 className="text-2xl font-bold text-stone-900 mb-4">하객 편의 기능</h4>
-              <ul className="space-y-3 font-medium">
-                {['원터치 계좌복사', '실시간 방명록', '네비게이션 연동'].map((item, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-stone-600">
-                    <CheckCircle2 className="w-5 h-5 text-rose-400" /> {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="md:col-span-2 p-10 rounded-3xl bg-stone-50 border border-stone-100/80 hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row items-center gap-8 justify-between">
-              <div>
-                <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-8">
-                  <Users className="text-stone-700 w-7 h-7" />
+                <div className="w-full flex-1 bg-white rounded-xl shadow-sm border border-zinc-100/50 p-3 flex items-center gap-2">
+                   <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center"><Sparkles className="w-4 h-4"/></div>
+                   <div className="flex-1 h-3 bg-zinc-100 rounded-full"></div>
                 </div>
-                <h4 className="text-2xl font-bold text-stone-900 mb-4">참석자 관리 대시보드</h4>
-                <p className="text-stone-500 text-lg leading-relaxed max-w-sm">
-                  누가 참석하는지, 식사 여부는 어떠한지 한눈에 파악하세요. 복잡한 인원 체크가 스마트해집니다.
-                </p>
-              </div>
-              <div className="w-full md:w-64 h-40 bg-white rounded-xl shadow-inner border border-stone-200 p-4 flex flex-col gap-3">
-                <div className="w-full h-8 bg-stone-100 rounded-md animate-pulse" />
-                <div className="w-3/4 h-8 bg-stone-100 rounded-md animate-pulse" />
-                <div className="w-5/6 h-8 bg-stone-100 rounded-md animate-pulse" />
               </div>
             </div>
-          </div>
+          </motion.div>
+
+          {/* 중간 박스 1: 방명록 */}
+          <motion.div variants={springFadeIn} className="md:col-span-2 bg-zinc-900 rounded-3xl p-8 text-white flex flex-row items-center justify-between overflow-hidden group">
+            <div className="flex-1">
+              <div className="w-10 h-10 bg-zinc-800 text-white rounded-xl flex items-center justify-center mb-4">
+                <MessageSquare className="w-5 h-5" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">실시간 축하 메시지</h3>
+              <p className="text-zinc-400 text-sm font-medium">하객들이 남겨준 축하 인사를 방명록에서 한눈에 확인하세요.</p>
+            </div>
+            <div className="w-32 h-32 bg-zinc-800 rounded-full flex items-center justify-center relative group-hover:scale-110 transition-transform">
+               <HeartHandshake className="w-12 h-12 text-rose-400" />
+               <div className="absolute top-2 right-2 w-4 h-4 bg-orange-500 rounded-full animate-bounce"></div>
+            </div>
+          </motion.div>
+
+          {/* 작은 박스 1: 1초 계좌복사 */}
+          <motion.div variants={springFadeIn} className="bg-white rounded-3xl p-6 border border-zinc-100 shadow-[0_8px_30px_rgb(0,0,0,0.03)] flex flex-col justify-between hover:-translate-y-1 transition-transform">
+            <div className="w-10 h-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center">
+              <CreditCard className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-zinc-900 mb-1">마음 전하기</h3>
+              <p className="text-zinc-500 text-sm font-medium">터치 한 번으로 쉽게 계좌번호를 복사할 수 있습니다.</p>
+            </div>
+          </motion.div>
+
+          {/* 작은 박스 2: 참석자 관리 */}
+          <motion.div variants={springFadeIn} className="bg-orange-50 rounded-3xl p-6 border border-orange-100 shadow-sm flex flex-col justify-between hover:-translate-y-1 transition-transform">
+            <div className="w-10 h-10 bg-white text-orange-500 rounded-xl flex items-center justify-center shadow-sm">
+              <Users className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-lg font-bold text-zinc-900">참석 인원 파악</h3>
+                <span className="px-2 py-0.5 bg-orange-500 text-white text-[10px] font-black rounded-full">PRO</span>
+              </div>
+              <p className="text-orange-700/70 text-sm font-medium">누가 오는지, 식사는 하는지 간편하게 취합하세요.</p>
+            </div>
+          </motion.div>
+
         </div>
-      </section>
+      </motion.section>
 
-      {/* 🌟 4. 푸터 (Footer) */}
-      <footer className="bg-stone-950 pt-20 pb-10 px-6 text-stone-400 border-t border-stone-800">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-          <div className="md:col-span-2">
-            <h2 className={`${koreanFont.className} text-3xl font-bold text-white mb-4 tracking-wider flex items-center gap-2`}>
-              <Sparkles className="text-amber-500 w-5 h-5" /> O'hoo
-            </h2>
-            <p className="text-stone-400 mb-6 max-w-sm leading-relaxed">
-              가장 아름다운 시작을 함께합니다.<br />
-              감성을 담은 프리미엄 모바일 청첩장 플랫폼.
-            </p>
+      {/* 🌟 3. 미니멀한 콜투액션(CTA) 섹션 (멘트 담백하게 변경) */}
+      <motion.section 
+        initial="initial" 
+        whileInView="animate" 
+        viewport={{ once: true, amount: 0.5 }} 
+        variants={staggerContainer}
+        className="mt-24 px-4 max-w-4xl mx-auto text-center"
+      >
+        <motion.div variants={springFadeIn} className="bg-zinc-900 rounded-[2.5rem] p-12 md:p-16 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500 rounded-full blur-[100px] opacity-20 -z-0"></div>
+          <div className="relative z-10">
+            <Link2 className="w-12 h-12 text-white/50 mx-auto mb-6" />
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-4 tracking-tight">지금 바로 만들어보세요.</h2>
+            <p className="text-zinc-400 mb-8 font-medium">수정은 언제든 자유롭게 가능합니다. 가벼운 마음으로 시작해보세요.</p>
+            {isLoggedIn ? (
+              <Link href="/create" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-zinc-900 font-bold rounded-full hover:bg-orange-500 hover:text-white transition-colors">
+                청첩장 만들기 시작 <ArrowRight className="w-4 h-4" />
+              </Link>
+            ) : (
+              <Link href="/signup" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-zinc-900 font-bold rounded-full hover:bg-orange-500 hover:text-white transition-colors">
+                회원가입 후 무료로 만들기 <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
           </div>
-          <div>
-            <h4 className="text-white font-bold mb-4">서비스</h4>
-            <ul className="space-y-2 font-medium">
-              <li><Link href="#" className="hover:text-amber-400 transition-colors">기능 소개</Link></li>
-              <li><Link href="#" className="hover:text-amber-400 transition-colors">샘플 디자인</Link></li>
-              <li><Link href="#" className="hover:text-amber-400 transition-colors">요금 안내</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-white font-bold mb-4">고객지원</h4>
-            <ul className="space-y-2 font-medium">
-              <li><Link href="#" className="hover:text-amber-400 transition-colors">자주 묻는 질문</Link></li>
-              <li><Link href="#" className="hover:text-amber-400 transition-colors">1:1 문의하기</Link></li>
-              <li><Link href="#" className="hover:text-amber-400 transition-colors">이용약관 및 개인정보처리방침</Link></li>
-            </ul>
-          </div>
+        </motion.div>
+      </motion.section>
+
+      {/* 🌟 4. 새로운 형태의 미니멀 푸터 */}
+      <footer className="mt-24 max-w-6xl mx-auto px-6 border-t border-zinc-200/60 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 pb-8">
+        <div className="flex items-center gap-2 text-zinc-900 font-black text-lg">
+          <Sparkles className="w-4 h-4 text-orange-500" /> O'hoo
         </div>
         
-        <div className="max-w-7xl mx-auto pt-8 border-t border-stone-800 text-sm flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>© 2026 O'hoo Web Service. All rights reserved.</p>
-          <div className="flex gap-4">
-            <span>사업자등록번호: 123-45-67890</span>
-            <span>통신판매업신고: 제2026-서울강남-0000호</span>
-          </div>
+        <div className="flex flex-wrap justify-center gap-6 text-sm font-medium text-zinc-500">
+          <Link href="#" className="hover:text-zinc-900 transition-colors">이용약관</Link>
+          <Link href="#" className="hover:text-zinc-900 transition-colors">개인정보처리방침</Link>
+          <Link href="#" className="hover:text-zinc-900 transition-colors">고객센터</Link>
+          <Link href="#" className="hover:text-zinc-900 transition-colors">자주 묻는 질문</Link>
+        </div>
+
+        <div className="text-xs text-zinc-400 font-medium">
+          © 2026 O'hoo Inc. All rights reserved.
         </div>
       </footer>
       

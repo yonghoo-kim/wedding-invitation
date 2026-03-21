@@ -1,10 +1,17 @@
+// app/login/page.tsx
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Sparkles, ArrowLeft, Loader2 } from 'lucide-react';
-import { loginUser } from '@/app/actions/userAuth'; // 🌟 registerUser 제거, loginUser만 사용
+import { loginUser } from '@/app/actions/userAuth';
+import { Noto_Sans_KR, Inter } from 'next/font/google';
+import * as motion from "framer-motion/client";
+
+// 🌟 폰트 설정 (회원가입 페이지와 동일한 무드)
+const inter = Inter({ subsets: ['latin'], display: 'swap' });
+const notoSansKr = Noto_Sans_KR({ subsets: ['latin'], weight: ['400', '500', '700', '900'], display: 'swap' });
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,13 +24,12 @@ export default function LoginPage() {
     setErrorMsg('');
 
     const formData = new FormData(e.currentTarget);
-    
-    // 🌟 분기 처리 없이 바로 로그인 서버 액션 실행
+
     const result = await loginUser(formData);
 
     if (result.success) {
       alert('로그인 되었습니다!');
-      router.push('/'); // 성공 시 메인 페이지로 이동
+      router.push('/');
       router.refresh();
     } else {
       setErrorMsg(result.error || '로그인 중 오류가 발생했습니다.');
@@ -31,83 +37,100 @@ export default function LoginPage() {
     }
   };
 
-  const inputClass = "w-full px-4 py-3.5 bg-stone-50 border border-stone-200 rounded-xl text-[15px] focus:outline-none focus:border-stone-800 focus:ring-1 focus:ring-stone-800 focus:bg-white transition-all";
+  // 🌟 인풋을 더 얇고 모던하게, 포커스 시 부드러운 오렌지 링 효과
+  const inputClass = "w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10 focus:bg-white transition-all text-zinc-900 font-medium placeholder:text-zinc-400";
+  const labelClass = "block text-[12px] font-bold text-zinc-600 mb-1.5";
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] flex flex-col justify-center items-center p-6 selection:bg-stone-200 font-sans">
-      <Link href="/" className="absolute top-8 left-8 flex items-center gap-2 text-stone-500 hover:text-stone-800 font-bold text-sm transition-colors">
-        <ArrowLeft className="w-4 h-4" /> 홈으로
+    <div className={`relative min-h-[100dvh] bg-[#FCFCFD] flex flex-col justify-center items-center p-4 sm:p-6 selection:bg-orange-100 ${notoSansKr.className} overflow-hidden`}>
+      
+      {/* 🌟 화사한 오로라빛 배경 (회원가입 페이지와 통일) */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none opacity-60">
+        <div className="absolute top-[-20%] left-[20%] w-[50%] h-[50%] rounded-full bg-gradient-to-br from-orange-200 to-rose-100 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-gradient-to-tl from-amber-100 to-yellow-50 blur-[100px]" />
+      </div>
+
+      {/* 🌟 홈으로 돌아가기 (플로팅 버튼 스타일) */}
+      <Link href="/" className="absolute top-6 left-6 flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 font-bold text-xs transition-colors bg-white/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-white shadow-sm z-10">
+        <ArrowLeft className="w-3.5 h-3.5" /> Home
       </Link>
 
-      <div className="w-full max-w-md bg-white p-8 md:p-10 rounded-[24px] shadow-[0_20px_60px_rgba(0,0,0,0.06)] border border-stone-100">
-        
-        <div className="flex flex-col items-center mb-10 text-center">
-          <div className="w-14 h-14 bg-stone-900 rounded-full flex items-center justify-center mb-5 shadow-md">
-            <Sparkles className="text-amber-200 w-7 h-7" />
+      {/* 🌟 폼 컨테이너: 오밀조밀하고 촘촘하게 구성 (Framer Motion 등장 효과) */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.4, ease: [0.33, 1, 0.68, 1] }}
+        className="w-full max-w-[400px] bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-white relative z-10"
+      >
+
+        <div className="flex flex-col items-center mb-8 text-center">
+          <div className="w-10 h-10 bg-zinc-900 rounded-xl flex items-center justify-center mb-4 shadow-sm">
+            <Sparkles className="text-white w-5 h-5" />
           </div>
-          <h1 className="text-2xl font-bold text-stone-900 tracking-tight">
-            다시 만나서 반가워요
+          <h1 className={`${inter.className} text-2xl font-black text-zinc-900 tracking-tight`}>
+            Welcome Back
           </h1>
-          <p className="text-sm text-stone-500 mt-2 font-medium">
+          <p className="text-[13px] text-zinc-500 mt-1.5 font-medium">
             등록하신 정보로 O'hoo에 로그인해주세요.
           </p>
         </div>
 
         {/* 🌟 순수 로그인 폼 */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-[13px] font-bold text-stone-700 mb-2">이메일 주소</label>
-            <input 
-              type="email" 
+            <label className={labelClass}>이메일 주소</label>
+            <input
+              type="email"
               name="email"
               required
-              placeholder="example@wedding.com" 
-              className={inputClass}
-            />
-          </div>
-          <div>
-            <div className="flex justify-between items-end mb-2">
-              <label className="block text-[13px] font-bold text-stone-700">비밀번호</label>
-              <Link href="#" className="text-[12px] text-stone-400 hover:text-stone-600 transition-colors font-medium">
-                비밀번호를 잊으셨나요?
-              </Link>
-            </div>
-            <input 
-              type="password" 
-              name="password"
-              required
-              placeholder="••••••••" 
+              tabIndex={1}
+              placeholder="name@example.com"
               className={inputClass}
             />
           </div>
           
+          <div>
+            <div className="flex justify-between items-end mb-1.5">
+              <label className={labelClass} style={{ marginBottom: 0 }}>비밀번호</label>
+            </div>
+            <input
+              type="password"
+              name="password"
+              required
+              tabIndex={2}
+              placeholder="••••••••"
+              className={inputClass}
+            />
+          </div>
+
           {errorMsg && (
-            <div className="p-3 bg-red-50 text-red-600 text-sm font-bold rounded-lg text-center border border-red-100">
+            <div className="p-2.5 bg-red-50 text-red-600 text-[13px] font-bold rounded-lg text-center border border-red-100">
               {errorMsg}
             </div>
           )}
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-2 py-4 mt-2 bg-stone-900 text-white font-bold text-[15px] rounded-xl hover:bg-stone-800 transition-all shadow-lg hover:shadow-xl disabled:opacity-50"
+            tabIndex={3}
+            className="w-full py-3.5 mt-2 bg-zinc-900 text-white font-bold text-[14px] rounded-xl hover:bg-orange-500 transition-all shadow-md hover:shadow-orange-500/20 disabled:opacity-50 disabled:hover:bg-zinc-900 disabled:shadow-none flex justify-center items-center gap-2"
           >
-            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
+            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             {isSubmitting ? '로그인 처리 중...' : 'O\'hoo 로그인'}
           </button>
         </form>
 
         {/* 🌟 회원가입 페이지로 넘어가는 링크 */}
-        <div className="mt-8 pt-6 border-t border-stone-100 text-center">
-          <p className="text-[13px] text-stone-500">
+        <div className="mt-6 pt-5 border-t border-zinc-100 text-center">
+          <p className="text-[12px] text-zinc-500 font-medium">
             아직 계정이 없으신가요?
-            <Link href="/signup" className="font-bold text-stone-900 hover:text-amber-600 transition-colors ml-2">
-              이메일로 무료 회원가입
+            <Link href="/signup" className="font-bold text-zinc-900 hover:text-orange-500 transition-colors ml-1.5">
+              무료 회원가입
             </Link>
           </p>
         </div>
 
-      </div>
+      </motion.div>
     </div>
   );
 }

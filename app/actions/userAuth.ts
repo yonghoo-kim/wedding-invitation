@@ -31,7 +31,12 @@ export async function registerUser(formData: FormData) {
     });
 
     const cookieStore = await cookies();
-    cookieStore.set('user_token', newUser.id, { maxAge: 60 * 60 * 24 * 7 });
+    // 💡 maxAge를 제거하여 브라우저 종료 시 삭제되는 세션 쿠키로 생성
+    cookieStore.set('user_token', newUser.id, { 
+      httpOnly: true, 
+      secure: process.env.NODE_ENV === 'production',
+      path: '/'
+    });
 
     return { success: true };
   } catch (error) {
@@ -56,9 +61,13 @@ export async function loginUser(formData: FormData) {
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) return { success: false, error: '비밀번호가 일치하지 않습니다.' };
 
-    // 로그인 성공 시 쿠키에 유저 ID 저장
     const cookieStore = await cookies();
-    cookieStore.set('user_token', user.id, { maxAge: 60 * 60 * 24 * 7 });
+    // 💡 maxAge를 제거하여 브라우저 종료 시 삭제되는 세션 쿠키로 생성
+    cookieStore.set('user_token', user.id, { 
+      httpOnly: true, 
+      secure: process.env.NODE_ENV === 'production',
+      path: '/'
+    });
 
     return { success: true };
   } catch (error) {

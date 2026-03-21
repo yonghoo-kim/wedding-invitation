@@ -17,7 +17,7 @@ export default function Step1_BasicInfo({ formData, handleFormChange }: any) {
         <label className={labelBase}>청첩장 고유 링크 (URL)</label>
         <div className={inputWrapper}>
           <Link2 className="ml-4 text-stone-400 w-5 h-5" />
-          <span className="pl-3 pr-1 py-3.5 text-stone-400 text-sm font-medium select-none hidden sm:block">our-wedding.com/</span>
+          <span className="pl-3 pr-1 py-3.5 text-stone-400 text-sm font-medium select-none hidden sm:block">https://ohoo-invitation.vercel.app/</span>
           <input type="text" name="urlSlug" value={formData.urlSlug} onChange={handleFormChange} placeholder="hong-park" className="flex-1 px-2 py-3.5 bg-transparent text-[15px] font-bold text-stone-800 outline-none placeholder:font-normal" />
         </div>
       </div>
