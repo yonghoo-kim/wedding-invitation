@@ -40,7 +40,7 @@ const STEPS = [
 
 export default function CreateInvitationPage() {
   const router = useRouter();
-  
+
   const [activeTab, setActiveTab] = useState(STEPS[0].id);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -50,6 +50,7 @@ export default function CreateInvitationPage() {
     groomLastName: '', groomFirstName: '', brideLastName: '', brideFirstName: '',
     weddingDate: '', weddingLocation: '', weddingAddress: '', weddingLat: '', weddingLng: '',
     galleryImages: [],
+    useRsvp: false,
   });
 
   const [groomAcc, setGroomAcc] = useState({ bank: '', account: '', fatherName: '', fatherBank: '', fatherAccount: '', motherName: '', motherBank: '', motherAccount: '' });
@@ -64,10 +65,15 @@ export default function CreateInvitationPage() {
   }, [activeTab]);
 
   const handleFormChange = (e: any) => {
-    if (e.target.name === 'urlSlug') {
-      setFormData({ ...formData, urlSlug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') });
+    const { name, value, type, checked } = e.target;
+
+    if (name === 'urlSlug') {
+      setFormData({ ...formData, urlSlug: value.toLowerCase().replace(/[^a-z0-9-]/g, '') });
+    } else if (type === 'checkbox') {
+      // 🌟 체크박스(토글)인 경우 value가 아닌 checked 값을 저장합니다.
+      setFormData({ ...formData, [name]: checked });
     } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
+      setFormData({ ...formData, [name]: value });
     }
   };
   const handleGroomAccChange = (e: any) => setGroomAcc({ ...groomAcc, [e.target.name]: e.target.value });
@@ -109,21 +115,21 @@ export default function CreateInvitationPage() {
   const previewLat = formData.weddingLat ? parseFloat(formData.weddingLat) : 37.502998;
   const previewLng = formData.weddingLng ? parseFloat(formData.weddingLng) : 127.041346;
   const previewTheme = formData.theme || 'spring';
-  
+
   const previewGroomAccount = {
     bank: groomAcc.bank || '카카오뱅크', account: groomAcc.account || '3333-01-1234567',
     father: { name: groomAcc.fatherName || '김아버지', bank: groomAcc.fatherBank || '국민은행', account: groomAcc.fatherAccount || '123-4567-890' },
     mother: { name: groomAcc.motherName || '강어머니', bank: groomAcc.motherBank || '신한은행', account: groomAcc.motherAccount || '098-7654-321' }
   };
-  
+
   const previewBrideAccount = {
     bank: brideAcc.bank || '토스뱅크', account: brideAcc.account || '1000-1234-5678',
     father: { name: brideAcc.fatherName || '이아버지', bank: brideAcc.fatherBank || '우리은행', account: brideAcc.fatherAccount || '111-222-333333' },
     mother: { name: brideAcc.motherName || '최어머니', bank: brideAcc.motherBank || '기업은행', account: brideAcc.motherAccount || '444-555-666666' }
   };
 
-  const previewGallery = formData.galleryImages && formData.galleryImages.length > 0 
-    ? formData.galleryImages 
+  const previewGallery = formData.galleryImages && formData.galleryImages.length > 0
+    ? formData.galleryImages
     : ['/images/wedding/section1.png'];
 
   return (
@@ -154,9 +160,8 @@ export default function CreateInvitationPage() {
               <button
                 key={step.id}
                 onClick={() => setActiveTab(step.id)}
-                className={`flex-shrink-0 text-left px-3.5 py-2 md:py-2.5 rounded-md text-[13px] font-bold transition-all ${
-                  activeTab === step.id ? 'bg-white text-stone-900 shadow-sm border border-stone-200/60' : 'text-stone-500 hover:bg-stone-100/50 hover:text-stone-800 border border-transparent'
-                }`}
+                className={`flex-shrink-0 text-left px-3.5 py-2 md:py-2.5 rounded-md text-[13px] font-bold transition-all ${activeTab === step.id ? 'bg-white text-stone-900 shadow-sm border border-stone-200/60' : 'text-stone-500 hover:bg-stone-100/50 hover:text-stone-800 border border-transparent'
+                  }`}
               >
                 {step.label}
               </button>
@@ -184,7 +189,7 @@ export default function CreateInvitationPage() {
 
         <aside className="hidden lg:flex w-[320px] xl:w-[360px] bg-[#F4F4F5]/50 border-l border-stone-200 items-center justify-center shrink-0 h-full relative">
           <div className="flex flex-col items-center gap-3 w-full justify-center">
-            
+
             <div className="flex items-center gap-1.5 text-stone-600 font-bold text-[12px] bg-white px-4 py-2 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.05)] border border-stone-100">
               <Smartphone className="w-3.5 h-3.5" /> iPhone Pro 미리보기
             </div>
@@ -193,17 +198,17 @@ export default function CreateInvitationPage() {
               <div className="absolute top-2 left-1/2 -translate-x-1/2 w-16 h-4 bg-stone-900 rounded-full z-[9999]"></div>
 
               <div className="absolute top-0 left-0 w-[420px] h-[880px] origin-top-left scale-[0.6] bg-stone-50 relative">
-                
+
                 <SeasonalEffect theme={previewTheme} key={`effect-${previewTheme}`} />
                 <FixedBackground theme={previewTheme} key={`bg-${previewTheme}`} />
 
                 <div className="absolute inset-0 w-full h-full overflow-y-auto overflow-x-hidden snap-y snap-mandatory custom-scrollbar preview-scroll">
                   <style>{`.preview-scroll section { height: 880px !important; min-height: 880px !important; scroll-snap-align: start; }`}</style>
-                  
+
                   <BackgroundMusic bgm={formData.bgmFilename} />
 
                   <div id="preview-basic">
-                    <Section1_Main 
+                    <Section1_Main
                       groomLastName={previewGroomLast}
                       groomFirstName={previewGroomFirst}
                       brideLastName={previewBrideLast}
@@ -213,7 +218,7 @@ export default function CreateInvitationPage() {
                   </div>
 
                   <div id="preview-greeting">
-                    <Section2_Quote 
+                    <Section2_Quote
                       greetingMessage={formData.greetingMessage}
                       groomFirstName={previewGroomFirst}
                       brideFirstName={previewBrideFirst}
@@ -224,27 +229,30 @@ export default function CreateInvitationPage() {
                     />
                   </div>
 
-                  {/* 🌟 preview-wedding (달력)과 preview-map (지도) 완벽 분리! */}
                   <div id="preview-wedding">
                     <Section3_Calendar weddingDate={previewDate} />
-                    <Section_RSVP invitationId="preview-only" />
+
+                    {/* 🌟 이 부분을 수정합니다! useRsvp가 true일 때만 렌더링 */}
+                    {formData.useRsvp && (
+                      <Section_RSVP invitationId="preview-only" />
+                    )}
                   </div>
-                  
+
                   <div id="preview-map">
-                    <Section5_Map 
+                    <Section5_Map
                       locationName={previewLocation}
                       address={previewAddress}
                       lat={previewLat}
                       lng={previewLng}
                     />
                   </div>
-                  
+
                   <div id="preview-media">
                     <Section4_Gallery images={previewGallery} />
                   </div>
-                  
+
                   <div id="preview-account">
-                    <Section6_Gift 
+                    <Section6_Gift
                       invitationId="preview-only"
                       groomLastName={previewGroomLast}
                       groomFirstName={previewGroomFirst}
@@ -253,12 +261,12 @@ export default function CreateInvitationPage() {
                       groomAccount={previewGroomAccount as any}
                       brideAccount={previewBrideAccount as any}
                     />
-                    <Section7_Closing 
+                    <Section7_Closing
                       closingImage={formData.closingImage || '/images/wedding/closing.png'}
                       weddingDate={previewDate}
                     />
                   </div>
-                  
+
                 </div>
               </div>
             </div>

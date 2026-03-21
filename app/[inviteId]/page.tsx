@@ -55,9 +55,7 @@ export async function generateMetadata({ params }: { params: { inviteId: string 
   const descText = `${year}년 ${month}월 ${day}일 ${ampm} ${hour12}시, ${invitation.weddingLocation}`;
 
   // 썸네일 이미지 (DB에 메인 이미지가 있으면 쓰고, 없으면 기본 갤러리 이미지 사용)
-  const ogImage = invitation.mainImage
-    ? `/images/wedding/${invitation.mainImage}`
-    : '/images/wedding/gallery-20.jpg';
+  const ogImage = invitation.mainImage;
 
   return {
     title: titleText,
@@ -110,6 +108,7 @@ export default async function InvitationHome({ params }: { params: { inviteId: s
         groomMotherName={groomAccount?.mother?.name}
         brideFatherName={brideAccount?.father?.name}
         brideMotherName={brideAccount?.mother?.name}
+        greetingMessage={invitation.greetingMessage}
         theme={invitation.theme as SeasonTheme} 
       />
       <Section3_Calendar weddingDate={invitation.weddingDate} theme={invitation.theme as SeasonTheme} />

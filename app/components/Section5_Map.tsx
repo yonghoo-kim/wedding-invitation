@@ -11,28 +11,28 @@ import { themeColors, SeasonTheme } from '@/lib/theme';
 
 // 🌟 2. Props에 대중교통 정보와 테마 추가
 interface Section5Props {
-  locationName: string;
-  address: string;
-  lat: number | null;
-  lng: number | null;
-  transitSubway?: string;  // 지하철 정보
-  transitBus?: string;     // 버스 정보
-  transitParking?: string; // 주차/안내 정보
-  theme?: SeasonTheme;     // 테마 컬러
+    locationName: string;
+    address: string;
+    lat: number | null;
+    lng: number | null;
+    transitSubway?: string;  // 지하철 정보
+    transitBus?: string;     // 버스 정보
+    transitParking?: string; // 주차/안내 정보
+    theme?: SeasonTheme;     // 테마 컬러
 }
 
 const koreanFont = Gowun_Batang({ subsets: ['latin'], weight: ['400', '700'], display: 'swap' });
 const englishFont = Playfair_Display({ subsets: ['latin'], weight: ['400', '600'], display: 'swap' });
 
-const Section5_Map = ({ 
-  locationName, 
-  address, 
-  lat, 
-  lng,
-  transitSubway,
-  transitBus,
-  transitParking,
-  theme = 'autumn'
+const Section5_Map = ({
+    locationName,
+    address,
+    lat,
+    lng,
+    transitSubway,
+    transitBus,
+    transitParking,
+    theme = 'autumn'
 }: Section5Props) => {
     const [loading, error] = useKakaoLoader({
         appkey: "a604d8920a0dd167831ffad84b10b2d3", // 본인의 API KEY 유지
@@ -42,7 +42,7 @@ const Section5_Map = ({
     const currentTheme = themeColors[theme];
 
     // DB에 좌표값이 비어있을 경우를 대비한 기본값
-    const LOCATION_LAT = lat || 37.5665; 
+    const LOCATION_LAT = lat || 37.5665;
     const LOCATION_LNG = lng || 126.9780;
 
     // 값이 없을 때 보여줄 기본(더미) 데이터
@@ -86,7 +86,15 @@ const Section5_Map = ({
                         <h3 className="text-base font-bold text-[13px] text-stone-900 mb-1">{locationName}</h3>
                         <div className="flex items-center justify-center gap-1 text-stone-500 text-[11px] font-medium">
                             <MapPin size={12} className="text-stone-400" />
-                            <span>{address}</span>
+                            <span className="text-center">
+                                {/* 주소에 쉼표(,)가 있으면 줄바꿈으로 변경 */}
+                                {address.split(',').map((part, index, array) => (
+                                    <span key={index}>
+                                        {part.trim()}
+                                        {index !== array.length - 1 && <br />}
+                                    </span>
+                                ))}
+                            </span>
                         </div>
                     </div>
 
@@ -124,7 +132,7 @@ const Section5_Map = ({
                             className="py-2.5 bg-[#FF4040] hover:brightness-95 text-white rounded-[4px] font-bold text-[10px] flex items-center justify-center shadow-sm transition-all"
                         >
                             티맵
-                        </a>            
+                        </a>
                     </div>
                 </div>
 
@@ -132,7 +140,7 @@ const Section5_Map = ({
 
                 {/* 🌟 3. 커스텀 교통편 안내 영역 */}
                 <div className="space-y-3 pl-1">
-                    
+
                     {/* 지하철 */}
                     {displaySubway && (
                         <div className="flex gap-3 items-start">

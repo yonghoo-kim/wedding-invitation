@@ -15,7 +15,7 @@ interface Section2Props {
   groomMotherName?: string;
   brideFatherName?: string;
   brideMotherName?: string;
-  greetingMessage?: string; 
+  greetingMessage?: string | null;
   theme?: SeasonTheme; // 테마 prop 추가
 }
 
@@ -55,12 +55,12 @@ const Section2_Quote = ({
         className="relative z-10 w-full max-w-sm px-4 py-12 text-center"
       >
         <div className="w-[1px] h-6 bg-stone-500 mx-auto mb-6 opacity-50"></div>
-        
+
         {/* 🎨 기존 text-amber-800 대신 테마 색상(currentTheme.text) 적용! */}
         <p className={`${englishFont.className} ${currentTheme.text} text-[11px] tracking-[0.3em] uppercase mb-4 font-medium drop-shadow-sm`}>
           Invitation
         </p>
-        
+
         <h2 className="text-stone-900 text-2xl font-bold mb-10 tracking-[0.2em] drop-shadow-sm">초대의 글</h2>
 
         {/* 🌟 5. 엔터(\n)를 감지하여 문단과 줄바꿈을 동적으로 렌더링하는 마법! */}
@@ -76,27 +76,27 @@ const Section2_Quote = ({
             </p>
           ))}
         </div>
-        
+
         <div className="w-[40px] h-[1px] bg-stone-400 mx-auto my-12 opacity-60" />
 
         <div className="grid grid-cols-[auto_auto_auto] gap-x-3 gap-y-3 justify-center items-center drop-shadow-sm mx-auto max-w-[300px]">
-            {/* --- 1열: 신랑 측 --- */}
-            <div className="text-right text-stone-700 text-[15px] tracking-tight whitespace-nowrap">
-                {groomParents}
-            </div>
-            <div className="text-center text-stone-400 text-[11px] whitespace-nowrap pt-[2px]">의 아들</div>
-            <div className="text-left text-xl font-bold text-stone-900 whitespace-nowrap">
-                {groomFirstName}
-            </div>
+          {/* --- 1열: 신랑 측 --- */}
+          <div className="text-right text-stone-700 text-[15px] tracking-tight whitespace-nowrap">
+            {groomParents}
+          </div>
+          <div className="text-center text-stone-400 text-[11px] whitespace-nowrap pt-[2px]">의 아들</div>
+          <div className="text-left text-xl font-bold text-stone-900 whitespace-nowrap">
+            {groomFirstName}
+          </div>
 
-            {/* --- 2열: 신부 측 --- */}
-            <div className="text-right text-stone-700 text-[15px] tracking-tight whitespace-nowrap">
-                {brideParents}
-            </div>
-            <div className="text-center text-stone-400 text-[11px] whitespace-nowrap pt-[2px]">의 딸</div>
-            <div className="text-left text-xl font-bold text-stone-900 whitespace-nowrap">
-                {brideFirstName}
-            </div>
+          {/* --- 2열: 신부 측 --- */}
+          <div className="text-right text-stone-700 text-[15px] tracking-tight whitespace-nowrap">
+            {brideParents}
+          </div>
+          <div className="text-center text-stone-400 text-[11px] whitespace-nowrap pt-[2px]">의 딸</div>
+          <div className="text-left text-xl font-bold text-stone-900 whitespace-nowrap">
+            {brideFirstName}
+          </div>
         </div>
       </motion.div>
     </section>
