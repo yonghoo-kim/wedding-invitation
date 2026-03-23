@@ -36,10 +36,11 @@ export default function Step2_WeddingInfo({ formData, handleFormChange }: Step2P
             <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none z-10">
               <CalendarDays className="w-5 h-5 text-stone-400 group-focus-within:text-amber-500 transition-colors" />
             </div>
+            {/* 🌟 value 값을 딱 16자리(YYYY-MM-DDTHH:mm)로 자르는 처리 추가 */}
             <input
               type="datetime-local"
               name="weddingDate"
-              value={formData.weddingDate}
+              value={formData.weddingDate ? formData.weddingDate.substring(0, 16) : ''}
               onChange={handleFormChange}
               className="w-full pl-12 pr-4 py-3.5 bg-stone-50 border border-stone-200 rounded-xl text-stone-800 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 hover:bg-white transition-all appearance-none cursor-pointer"
             />
@@ -130,7 +131,7 @@ export default function Step2_WeddingInfo({ formData, handleFormChange }: Step2P
         </div>
       </section>
 
-      {/* 🌟 3. 오시는 길 및 교통수단 안내 (새로 추가된 섹션) */}
+      {/* 3. 오시는 길 및 교통수단 안내 */}
       <section 
         onClick={() => scrollToPreview('preview-map')} 
         onFocus={() => scrollToPreview('preview-map')}
