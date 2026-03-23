@@ -8,35 +8,37 @@ import { Gowun_Batang } from 'next/font/google';
 import CalendarWidget from '@/app/components/CalendarWidget';
 import { themeColors, SeasonTheme } from '@/lib/theme';
 
-// 🌟 1. Props 타입 정의 (테마 추가)
 interface Section3Props {
-  weddingDate: Date;
+  weddingDate: Date; // 🌟 밖에서는 무조건 원본(UTC) Date를 그대로 받습니다.
   theme?: SeasonTheme;
 }
 
 const koreanFont = Gowun_Batang({ subsets: ['latin'], weight: ['400', '700'], display: 'swap' });
 
-// 🌟 2. Props 적용
 const Section3_Calendar = ({ weddingDate, theme = 'autumn' }: Section3Props) => {
   const [isMounted, setIsMounted] = useState(false);
-
-  // 현재 테마 색상 가져오기
   const currentTheme = themeColors[theme];
 
-  // 🌟 3. Date 객체에서 필요한 정보 추출
-  const year = weddingDate.getFullYear();
-  const month = weddingDate.getMonth() + 1;
-  const day = weddingDate.getDate();
+  // 🌟 [핵심 1] 텍스트 출력을 위한 완벽한 KST 변환
+  // 원본 시간에 명시적으로 9시간을 더한 뒤, 브라우저 타임존을 무시하는 getUTC 메서드로만 숫자를 뽑아냅니다.
+  const kstTime = weddingDate.getTime() + (9 * 60 * 60 * 1000);
+  const kstDate = new Date(kstTime);
 
-  // 요일 구하기 (영문)
+  const year = kstDate.getUTCFullYear();
+  const month = kstDate.getUTCMonth() + 1;
+  const day = kstDate.getUTCDate();
+
   const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-  const dayOfWeekEn = daysOfWeek[weddingDate.getDay()];
+  const dayOfWeekEn = daysOfWeek[kstDate.getUTCDay()];
 
-  // 시간 12시간제로 변환 및 AM/PM 구하기
-  const hours24 = weddingDate.getHours();
-  const minute = String(weddingDate.getMinutes()).padStart(2, '0');
+  const hours24 = kstDate.getUTCHours();
+  const minute = String(kstDate.getUTCMinutes()).padStart(2, '0');
   const ampm = hours24 >= 12 ? 'PM' : 'AM';
-  const hour12 = hours24 % 12 || 12; // 0시는 12시로 표기
+  const hour12 = hours24 % 12 || 12;
+
+  // 🌟 [핵심 2] 해외에서 접속해도 달력(CalendarWidget)의 '일(day)'이 틀어지지 않게 고정
+  // 오직 화면 달력 렌더링만을 위한 가짜 로컬 Date 객체를 생성합니다. (오류 방지를 위해 낮 12시로 고정)
+  const displayOnlyDate = new Date(`${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T12:00:00`);
 
   useEffect(() => {
     setIsMounted(true);
@@ -59,7 +61,6 @@ const Section3_Calendar = ({ weddingDate, theme = 'autumn' }: Section3Props) => 
     return (
       <div className="flex flex-col items-center w-full">
         <div className={`${koreanFont.className} text-stone-500 font-medium text-sm mb-4 tracking-widest`}>
-          {/* 🎨 D-Day 숫자에 테마 색상 적용 */}
           D <span className="mx-1">-</span> <span className={`text-xl font-bold ${currentTheme.text}`}>{days}</span>
         </div>
         <div className="flex justify-center items-start gap-1">
@@ -89,10 +90,8 @@ const Section3_Calendar = ({ weddingDate, theme = 'autumn' }: Section3Props) => 
           {year}. {month}. {day}. {dayOfWeekEn} {hour12}:{minute} {ampm}
         </p>
 
-        {/* 🌟 캘린더 위젯에도 테마를 넘겨줄 수 있도록 추가했습니다 (위젯 내부 수정 필요) */}
-        <CalendarWidget weddingDate={weddingDate} theme={theme} />
+        <CalendarWidget weddingDate={displayOnlyDate} theme={theme} />
 
-        {/* 카운트다운 박스 */}
         <div className="w-full py-6 px-4 rounded-lg border border-stone-300/50 flex justify-center min-h-[110px] bg-white/40 shadow-inner">
           {isMounted ? (
             <Countdown date={weddingDate} renderer={renderer} />

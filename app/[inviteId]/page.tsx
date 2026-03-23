@@ -37,7 +37,7 @@ const getClientSafeKSTDate = (utcDate: Date) => {
   // 1. UTC 시간에 9시간을 더합니다.
   const kstTime = utcDate.getTime() + (9 * 60 * 60 * 1000);
   const kstDate = new Date(kstTime);
-  
+
   // 2. KST 기준의 년, 월, 일, 시, 분을 추출 (getUTC... 메서드 사용)
   const y = kstDate.getUTCFullYear();
   const m = String(kstDate.getUTCMonth() + 1).padStart(2, '0');
@@ -52,7 +52,7 @@ const getClientSafeKSTDate = (utcDate: Date) => {
 export async function generateMetadata({ params }: { params: { inviteId: string } }) {
   const { inviteId } = await params;
   const invitation = await prisma.invitation.findUnique({ where: { urlSlug: inviteId } });
-  
+
   if (!invitation) {
     return { title: '청첩장을 찾을 수 없습니다.' };
   }
@@ -62,13 +62,13 @@ export async function generateMetadata({ params }: { params: { inviteId: string 
 
   const groomName = `${invitation.groomLastName}${invitation.groomFirstName}`;
   const brideName = `${invitation.brideLastName}${invitation.brideFirstName}`;
-  
+
   const year = clientSafeDate.getFullYear();
   const month = clientSafeDate.getMonth() + 1;
   const day = clientSafeDate.getDate();
 
   const hours24 = clientSafeDate.getHours();
-  const minutes = clientSafeDate.getMinutes(); 
+  const minutes = clientSafeDate.getMinutes();
   const hour12 = hours24 % 12 || 12;
   const ampm = hours24 >= 12 ? '오후' : '오전';
 
@@ -119,7 +119,7 @@ export default async function InvitationHome({ params }: { params: { inviteId: s
       <SeasonalEffect theme={invitation.theme} />
       <BackgroundMusic bgm={invitation.bgmFilename ?? ''} />
       <FixedBackground theme={invitation.theme} />
-      
+
       <Section1_Main
         groomLastName={invitation.groomLastName}
         groomFirstName={invitation.groomFirstName}
@@ -127,7 +127,7 @@ export default async function InvitationHome({ params }: { params: { inviteId: s
         brideFirstName={invitation.brideFirstName}
         mainImage={invitation.mainImage}
       />
-      
+
       <Section2_Quote
         groomFirstName={invitation.groomFirstName}
         brideFirstName={invitation.brideFirstName}
@@ -136,20 +136,20 @@ export default async function InvitationHome({ params }: { params: { inviteId: s
         brideFatherName={brideAccount?.father?.name}
         brideMotherName={brideAccount?.mother?.name}
         greetingMessage={invitation.greetingMessage}
-        theme={invitation.theme as SeasonTheme} 
+        theme={invitation.theme as SeasonTheme}
       />
-      
-      <Section3_Calendar weddingDate={clientSafeDate} theme={invitation.theme as SeasonTheme} />
+
+      <Section3_Calendar weddingDate={invitation.weddingDate} />
       
       {invitation.useRsvp && (
-        <Section_RSVP 
-          invitationId={invitation.id} 
-          theme={invitation.theme as SeasonTheme} 
+        <Section_RSVP
+          invitationId={invitation.id}
+          theme={invitation.theme as SeasonTheme}
         />
       )}
-      
+
       <Section4_Gallery images={invitation.galleryImages} />
-      
+
       <Section5_Map
         locationName={invitation.weddingLocation}
         address={invitation.weddingAddress}
@@ -160,7 +160,7 @@ export default async function InvitationHome({ params }: { params: { inviteId: s
         transitParking={invitation.transitParking || undefined}
         theme={invitation.theme as SeasonTheme}
       />
-      
+
       <Section6_Gift
         invitationId={invitation.id}
         groomLastName={invitation.groomLastName}
@@ -170,7 +170,7 @@ export default async function InvitationHome({ params }: { params: { inviteId: s
         groomAccount={groomAccount}
         brideAccount={brideAccount}
       />
-      
+
       <Section7_Closing
         closingImage={invitation.closingImage}
         weddingDate={clientSafeDate}
