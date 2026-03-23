@@ -10,24 +10,25 @@ interface PageProps {
 export default async function AdminEditPage({ params }: PageProps) {
   const { inviteId } = await params;
 
-  // DB에서 기존 데이터 불러오기 (urlSlug나 id 모두 대응 가능하게 찾기)
+  // DB에서 기존 데이터 불러오기
   const invitation = await prisma.invitation.findFirst({
     where: { OR: [{ id: inviteId }, { urlSlug: inviteId }] },
   });
 
   if (!invitation) return notFound();
 
-  // 날짜 데이터를 input[type="datetime-local"]에 맞게 포맷팅 (YYYY-MM-DDTHH:mm)
+  // 🌟 [핵심] DB의 UTC 시간에 무조건 9시간을 더해 KST로 맞춘 후 문자열로 변환!
   const formatForInput = (date: Date) => {
-    const d = new Date(date);
-    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-    return d.toISOString().slice(0, 16);
+    // 9시간 = 9 * 60분 * 60초 * 1000밀리초
+    const kstTime = date.getTime() + (9 * 60 * 60 * 1000);
+    const kstDate = new Date(kstTime);
+    // getISOString()은 항상 Z 포맷으로 나오므로, 16자리까지만 자르면 완벽한 KST 로컬 시간이 됨
+    return kstDate.toISOString().slice(0, 16);
   };
 
   const formattedData = {
     ...invitation,
     weddingDate: formatForInput(invitation.weddingDate),
-    // 계좌 정보가 빈 객체일 경우를 대비
     groomAccountInfo: invitation.groomAccountInfo || {},
     brideAccountInfo: invitation.brideAccountInfo || {},
   };
